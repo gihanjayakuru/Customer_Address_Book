@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <h2>Edit Customer</h2>
-    <form action="{{ route('customers.update', $customer->id) }}" method="POST">
+    <form id="customer-edit-form" action="{{ route('customers.update', $customer->id) }}" method="POST">
         @csrf
         @method('PUT')
         <div class="form-group">
@@ -51,6 +51,8 @@
 
         <button type="submit" class="btn btn-success">Update</button>
     </form>
+
+    <div id="status-message" class="alert" style="display:none;"></div>
 </div>
 
 <script>
@@ -74,6 +76,38 @@
             `;
             addressList.appendChild(newField);
             addressIndex++;
+        });
+
+        //handle ajax form submission for customer edit
+        const customerForm = document.getElementById('customer-edit-form');
+        customerForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(customerForm);
+            const url = customerForm.getAttribute('action');
+
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const statusMessage = document.getElementById('status-message');
+                if (data.success) {
+                    statusMessage.classList.add('alert-success');
+                    statusMessage.textContent = data.message;
+                    statusMessage.style.display = 'block';
+                    setTimeout(() => window.location.href = '/customers', 1000);
+                } else {
+                    statusMessage.classList.add('alert-danger');
+                    statusMessage.textContent = 'Error: ' + data.message;
+                    statusMessage.style.display = 'block';
+                }
+            })
+            .catch(error => console.error('Error:', error));
         });
     });
 

@@ -27,12 +27,7 @@
                 <td>{{ $customer->status }}</td>
                 <td>
                     <a href="{{ route('customers.edit', $customer->id) }}" class="btn btn-info">Edit</a>
-                    <form action="{{ route('customers.destroy', $customer->id) }}" method="POST"
-                        style="display: inline-block;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                    </form>
+                    <button class="btn btn-danger delete-customer" data-id="{{ $customer->id }}">Delete</button>
                 </td>
             </tr>
             <tr id="details-{{ $customer->id }}" style="display: none;">
@@ -51,9 +46,37 @@
 
 <script>
     function toggleDetails(customerId) {
-    const details = document.getElementById('details-' + customerId);
-    const isVisible = details.style.display === 'table-row';
-    details.style.display = isVisible ? 'none' : 'table-row';
-}
+        const details = document.getElementById('details-' + customerId);
+        const isVisible = details.style.display === 'table-row';
+        details.style.display = isVisible ? 'none' : 'table-row';
+    }
+
+    // Handle AJAX deletion
+    document.querySelectorAll('.delete-customer').forEach(button => {
+        button.addEventListener('click', function () {
+            const customerId = this.getAttribute('data-id');
+            const url = `/customers/${customerId}`;
+
+            if (confirm('Are you sure you want to delete this customer?')) {
+                fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Remove customer row
+                        document.querySelector(`tr[data-id="${customerId}"]`).remove();
+                        alert(data.message);
+                    } else {
+                        alert('Failed to delete customer.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        });
+    });
 </script>
 @endsection

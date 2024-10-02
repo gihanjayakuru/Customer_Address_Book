@@ -70,21 +70,29 @@ class CustomerController extends Controller
      */
     public function update(StoreCustomerRequest $request, Customer $customer)
     {
-        $customer->update($request->validated());
-        $customer->addresses()->delete();
-        if ($request->has('addresses') && is_array($request->addresses)) {
-            $customer->addresses()->createMany($request->addresses);
+        try {
+            $customer->update($request->validated());
+            $customer->addresses()->delete();
+            if ($request->has('addresses') && is_array($request->addresses)) {
+                $customer->addresses()->createMany($request->addresses);
+            }
+            return response()->json(['success' => true, 'message' => 'Customer updated successfully.', 'customer' => new CustomerResource($customer)]);
+        } catch (\Exception $e) {
+            Log::alert('Customer update failed: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Failed to update customer.'], 500);
         }
-
-        return redirect()->route('customers.index')->with('success', 'Customer updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+
     public function destroy(Customer $customer)
     {
-        $customer->delete();
-        return redirect()->route('customers.index')->with('success', 'Customer deleted successfully.');
+        try {
+            $customer->delete();
+            return response()->json(['success' => true, 'message' => 'Customer deleted successfully.']);
+        } catch (\Exception $e) {
+            Log::alert('Customer deletion failed: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Failed to delete customer.'], 500);
+        }
     }
+
 }
