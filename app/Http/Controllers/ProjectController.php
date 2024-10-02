@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreProjectRequest;
+use App\Http\Resources\ProjectResource;
 use App\Models\Project;
 use Illuminate\Http\Request;
 
@@ -13,7 +15,7 @@ class ProjectController extends Controller
     public function index()
     {
         $projects = Project::with('customers')->get();
-        return response()->json($projects);
+        return ProjectResource::collection($projects);
     }
 
     /**
@@ -27,13 +29,11 @@ class ProjectController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreProjectRequest $request)
     {
-        $project = Project::create($request->all());
-        if ($request->has('customer_ids')){
-            $project->customers()->sync($request->customer_ids);
-        }
-        return response()->json($project,201);
+        $project = Project::create($request->validated());
+        $project->customers()->sync($request->customers);
+        return new ProjectResource($project);
     }
 
     /**
@@ -41,7 +41,7 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        return response()->json($project);
+        return new ProjectResource($project->load('customers'));
     }
 
     /**
@@ -55,14 +55,11 @@ class ProjectController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Project $project)
+    public function update(StoreProjectRequest $request, Project $project)
     {
-        $project->update($request->all());
-
-        if($request->has('customer_ids')){
-            $project->customers()->sync($request->customer_ids);
-        }
-        return response()->json($project);
+        $project->update($request->validated());
+        $project->customers()->sync($request->customers);
+        return new ProjectResource($project);
     }
 
     /**
@@ -71,6 +68,6 @@ class ProjectController extends Controller
     public function destroy(Project $project)
     {
         $project->delete();
-        return response()->json(null,204);
+        return response()->json(['message'=>'Project deleted successfully'],200);
     }
 }

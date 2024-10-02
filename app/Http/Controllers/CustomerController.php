@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreCustomerRequest;
+use App\Http\Resources\CustomerResource;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 
@@ -12,8 +14,8 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        $customers = Customer::all();
-        return response()->json($customers);
+        $customers = Customer::with('addresses')->get();
+        return CustomerResource::collection($customers);
     }
 
     /**
@@ -27,10 +29,11 @@ class CustomerController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreCustomerRequest $request)
     {
-        $customer = Customer::create($request->all());
-        return response()->json($customer, 201);
+         $customer = Customer::create($request->validated());
+         $customer->addresses()->createMany($request->addresses);
+         return new CustomerResource($customer);
     }
 
     /**
@@ -38,7 +41,7 @@ class CustomerController extends Controller
      */
     public function show(Customer $customer)
     {
-        return response()->json($customer);
+        return new CustomerResource($customer->load('addresses'));
     }
 
 
@@ -53,10 +56,12 @@ class CustomerController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Customer $customer)
+    public function update(StoreCustomerRequest $request, Customer $customer)
     {
-        $customer->update($request->all());
-        return response()->json($customer);
+        $customer->update($request->validated());
+        $customer->addresses()->delete();
+        $customer->addresses()->createMany($request->addresses);
+        return new CustomerResource($customer);
     }
 
     /**
