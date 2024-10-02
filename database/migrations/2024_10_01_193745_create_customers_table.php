@@ -14,7 +14,11 @@ return new class extends Migration
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('company');
+            $table->string('phone');
             $table->string('email')->unique();
+            $table->string('country');
+            $table->enum('status',['active','Inactive'])->default('active');
             $table->timestamps();
         });
     }
