@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <h2>Add New Customer</h2>
-    <form action="{{ route('customers.store') }}" method="POST">
+    <form id="customer-form" action="{{ route('customers.store') }}" method="POST">
         @csrf
         <div class="form-group">
             <label for="name">Name:</label>
@@ -42,6 +42,8 @@
 
         <button type="submit" class="btn btn-success">Submit</button>
     </form>
+
+    <div id="status-message" class="alert" style="display:none;"></div>
 </div>
 
 <script>
@@ -76,6 +78,39 @@
         }
 
         setupRemoveButtons();
+
+        // handle ajax form submission
+        const customerForm = document.getElementById('customer-form');
+        customerForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(customerForm);
+            const url = customerForm.getAttribute('action');
+            
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const statusMessage = document.getElementById('status-message');
+                if (data.success) {
+                    statusMessage.classList.add('alert-success');
+                    statusMessage.textContent = data.message;
+                    statusMessage.style.display = 'block';
+                   
+                    setTimeout(() => window.location.href = '/customers', 1000);
+                } else {
+                    statusMessage.classList.add('alert-danger');
+                    statusMessage.textContent = 'Error: ' + data.message;
+                    statusMessage.style.display = 'block';
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
     });
 </script>
 @endsection

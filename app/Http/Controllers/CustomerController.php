@@ -38,12 +38,13 @@ class CustomerController extends Controller
                 $customer->addresses()->createMany($request->addresses);
             }
 
-            return redirect()->route('customers.index')->with('success', 'Customer created successfully.');
+            return response()->json(['success' => true, 'message' => 'Customer created successfully.', 'customer' => new CustomerResource($customer)]);
         } catch (\Exception $e) {
             Log::alert('Customer creation failed: ' . $e->getMessage());
-            return redirect()->back()->withErrors('Failed to create customer.')->withInput();
+            return response()->json(['success' => false, 'message' => 'Failed to create customer.'], 500);
         }
     }
+
 
     /**
      * Display the specified resource.
