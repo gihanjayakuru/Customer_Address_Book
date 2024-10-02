@@ -4,6 +4,10 @@
 <div class="container">
     <h1>Customers</h1>
     <a href="{{ route('customers.create') }}" class="btn btn-primary mb-2"><i class="fa fa-plus"></i> Add Customer</a>
+
+    @if ($customers->isEmpty())
+    <p>No customers found.</p>
+    @else
     <table class="table">
         <thead>
             <tr>
@@ -16,9 +20,10 @@
                 <th>Actions</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="customer-list">
             @foreach ($customers as $customer)
-            <tr onclick="toggleDetails({{ $customer->id }})" style="cursor: pointer;">
+            <tr id="customer-row-{{ $customer->id }}" onclick="toggleDetails({{ $customer->id }})"
+                style="cursor: pointer;">
                 <td>{{ $customer->name }}</td>
                 <td>{{ $customer->company }}</td>
                 <td>{{ $customer->phone }}</td>
@@ -42,6 +47,10 @@
             @endforeach
         </tbody>
     </table>
+    <div class="d-flex justify-content-center">
+        {{ $customers->links() }}
+    </div>
+    @endif
 </div>
 
 <script>
@@ -52,30 +61,33 @@
     }
 
     // Handle AJAX deletion
-    document.querySelectorAll('.delete-customer').forEach(button => {
-        button.addEventListener('click', function () {
-            const customerId = this.getAttribute('data-id');
-            const url = `/customers/${customerId}`;
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.delete-customer').forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.stopPropagation();
+                const customerId = this.getAttribute('data-id');
+                const url = `/customers/${customerId}`;
 
-            if (confirm('Are you sure you want to delete this customer?')) {
-                fetch(url, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Remove customer row
-                        document.querySelector(`tr[data-id="${customerId}"]`).remove();
-                        alert(data.message);
-                    } else {
-                        alert('Failed to delete customer.');
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-            }
+                if (confirm('Are you sure you want to delete this customer?')) {
+                    fetch(url, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById(`customer-row-${customerId}`).remove();
+                            document.getElementById(`details-${customerId}`).remove();
+                            alert(data.message);
+                        } else {
+                            alert('Failed to delete customer.');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                }
+            });
         });
     });
 </script>

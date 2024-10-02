@@ -15,7 +15,7 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        $customers = Customer::with('addresses')->get();
+        $customers = Customer::with('addresses')->paginate(10);
         return view('customers.index', compact('customers'));
     }
 
@@ -91,7 +91,7 @@ class CustomerController extends Controller
             return response()->json(['success' => true, 'message' => 'Customer deleted successfully.']);
         } catch (\Exception $e) {
             Log::alert('Customer deletion failed: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Failed to delete customer.'], 500);
+            return response()->json(['success' => false, 'message' => 'Failed to delete customer.']);
         }
     }
 

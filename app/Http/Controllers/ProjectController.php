@@ -15,7 +15,7 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $projects = Project::with('customers')->get();
+        $projects = Project::with('customers')->paginate(10);
         return view('projects.index', compact('projects'));
     }
 
@@ -94,7 +94,11 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        $project->delete();
-        return redirect()->route('projects.index')->with('success', 'Project deleted successfully.');
+        try {
+            $project->delete();
+            return response()->json(['success' => true, 'message' => 'Project deleted successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to delete project.']);
+        }
     }
 }
