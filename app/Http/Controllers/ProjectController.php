@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Resources\ProjectResource;
+use App\Models\Customer;
 use App\Models\Project;
 use Illuminate\Http\Request;
 
@@ -15,7 +16,7 @@ class ProjectController extends Controller
     public function index()
     {
         $projects = Project::with('customers')->get();
-        return ProjectResource::collection($projects);
+        return view('projects.index', compact('projects'));
     }
 
     /**
@@ -23,7 +24,8 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        //
+        $customers = Customer::all();
+        return view('projects.create', compact('customers'));
     }
 
     /**
@@ -32,8 +34,8 @@ class ProjectController extends Controller
     public function store(StoreProjectRequest $request)
     {
         $project = Project::create($request->validated());
-        $project->customers()->sync($request->customers);
-        return new ProjectResource($project);
+        $project->customers()->sync($request->get('customers', []));
+        return redirect()->route('projects.index')->with('success', 'Project created successfully.');
     }
 
     /**
@@ -41,15 +43,18 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        return new ProjectResource($project->load('customers'));
+        $project->load('customers');
+        return view('projects.show', compact('project'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Project $project)
     {
-        //
+        $customers = Customer::all();
+        $project->load('customers');
+        return view('projects.edit', compact('project', 'customers'));
     }
 
     /**
@@ -58,8 +63,8 @@ class ProjectController extends Controller
     public function update(StoreProjectRequest $request, Project $project)
     {
         $project->update($request->validated());
-        $project->customers()->sync($request->customers);
-        return new ProjectResource($project);
+        $project->customers()->sync($request->get('customers', [])); 
+        return redirect()->route('projects.index')->with('success', 'Project updated successfully.');
     }
 
     /**
@@ -68,6 +73,6 @@ class ProjectController extends Controller
     public function destroy(Project $project)
     {
         $project->delete();
-        return response()->json(['message'=>'Project deleted successfully'],200);
+        return redirect()->route('projects.index')->with('success', 'Project deleted successfully.');
     }
 }

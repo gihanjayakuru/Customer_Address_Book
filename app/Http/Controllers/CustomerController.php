@@ -15,7 +15,7 @@ class CustomerController extends Controller
     public function index()
     {
         $customers = Customer::with('addresses')->get();
-        return CustomerResource::collection($customers);
+        return view('customers.index', compact('customers'));
     }
 
     /**
@@ -23,7 +23,7 @@ class CustomerController extends Controller
      */
     public function create()
     {
-        //
+        return view('customers.create');
     }
 
     /**
@@ -31,9 +31,12 @@ class CustomerController extends Controller
      */
     public function store(StoreCustomerRequest $request)
     {
-         $customer = Customer::create($request->validated());
-         $customer->addresses()->createMany($request->addresses);
-         return new CustomerResource($customer);
+        $customer = Customer::create($request->validated());
+        if ($request->has('addresses')) {
+            $customer->addresses()->createMany($request->addresses);
+        }
+
+        return redirect()->route('customers.index')->with('success', 'Customer created successfully.');
     }
 
     /**
@@ -41,7 +44,7 @@ class CustomerController extends Controller
      */
     public function show(Customer $customer)
     {
-        return new CustomerResource($customer->load('addresses'));
+        return view('customers.show', compact('customer'));
     }
 
 
@@ -50,7 +53,7 @@ class CustomerController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        return view('customers.edit', compact('customer'));
     }
 
     /**
@@ -59,9 +62,12 @@ class CustomerController extends Controller
     public function update(StoreCustomerRequest $request, Customer $customer)
     {
         $customer->update($request->validated());
-        $customer->addresses()->delete();
-        $customer->addresses()->createMany($request->addresses);
-        return new CustomerResource($customer);
+        $customer->addresses()->delete(); 
+        if ($request->has('addresses')) {
+            $customer->addresses()->createMany($request->addresses);
+        }
+
+        return redirect()->route('customers.index')->with('success', 'Customer updated successfully.');
     }
 
     /**
@@ -70,6 +76,6 @@ class CustomerController extends Controller
     public function destroy(Customer $customer)
     {
         $customer->delete();
-        return response()->json(null, 204);
+        return redirect()->route('customers.index')->with('success', 'Customer deleted successfully.');
     }
 }
