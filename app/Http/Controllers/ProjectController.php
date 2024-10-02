@@ -35,16 +35,14 @@ class ProjectController extends Controller
     {
         try {
             $validatedData = $request->validated();
-
             $project = Project::create([
                 'name' => $validatedData['name'],
                 'description' => $validatedData['description'],
             ]);
 
-            $customerIds = explode(',', $request->input('customers'));
-            $project->customers()->sync($customerIds);
+            $project->customers()->sync($validatedData['customers'] ?? []);
 
-            return response()->json(['success' => true, 'message' => 'Project created successfully.']);
+            return response()->json(['success' => true, 'message' => 'Project successfully created!']);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Failed to create project.']);
         }
@@ -64,9 +62,8 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        $customers = Customer::all(); 
-        $selectedCustomers = $project->customers->pluck('id')->implode(',');
-
+        $customers = Customer::all();
+        $selectedCustomers = $project->customers->pluck('id');
         return view('projects.edit', compact('project', 'customers', 'selectedCustomers'));
     }
 
@@ -76,13 +73,15 @@ class ProjectController extends Controller
     public function update(StoreProjectRequest $request, Project $project)
     {
         try {
-            $validatedData = $request->validated();
+            $validated = $request->validated();
+            $project->update([
+                'name' => $validated['name'],
+                'description' => $validated['description']
+            ]);
 
-            $project->update($validatedData);
-            $customerIds = explode(',', $request->input('customers'));
-            $project->customers()->sync($customerIds);
+            $project->customers()->sync($validated['customers']);
 
-            return response()->json(['success' => true, 'message' => 'Project updated successfully.']);
+            return response()->json(['success' => true, 'message' => 'Project successfully updated!']);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Failed to update project.']);
         }
