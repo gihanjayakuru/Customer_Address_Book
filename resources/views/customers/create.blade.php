@@ -29,14 +29,12 @@
         <h3>Address Details:</h3>
         <div id="address-fields-list">
             <div class="form-group address-field">
+                <label>Number:</label>
+                <input type="text" class="form-control" name="addresses[0][number]" required>
                 <label>Street:</label>
                 <input type="text" class="form-control" name="addresses[0][street]" required>
                 <label>City:</label>
                 <input type="text" class="form-control" name="addresses[0][city]" required>
-                <label>State:</label>
-                <input type="text" class="form-control" name="addresses[0][state]" required>
-                <label>Postal Code:</label>
-                <input type="text" class="form-control" name="addresses[0][postal_code]" required>
                 <button type="button" class="btn btn-danger remove-address" style="margin-top: 10px;">Remove</button>
             </div>
         </div>
@@ -48,38 +46,36 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-    let addressIndex = 1;
-    const addAddressButton = document.querySelector('.add-address');
-    const addressList = document.getElementById('address-fields-list');
+        let addressIndex = 1;
+        const addAddressButton = document.querySelector('.add-address');
+        const addressList = document.getElementById('address-fields-list');
 
-    addAddressButton.addEventListener('click', function () {
-        const newField = document.createElement('div');
-        newField.classList.add('form-group', 'address-field');
-        newField.innerHTML = `
-            <label>Street:</label>
-            <input type="text" class="form-control" name="addresses[${addressIndex}][street]" required>
-            <label>City:</label>
-            <input type="text" class="form-control" name="addresses[${addressIndex}][city]" required>
-            <label>State:</label>
-            <input type="text" class="form-control" name="addresses[${addressIndex}][state]" required>
-            <label>Postal Code:</label>
-            <input type="text" class="form-control" name="addresses[${addressIndex}][postal_code]" required>
-            <button type="button" class="btn btn-danger remove-address" style="margin-top: 10px;">Remove</button>
-        `;
-        addressList.appendChild(newField);
-        addressIndex++;
+        addAddressButton.addEventListener('click', function () {
+            const newField = document.createElement('div');
+            newField.classList.add('form-group', 'address-field');
+            newField.innerHTML = `
+                <label>Number:</label>
+                <input type="text" class="form-control" name="addresses[${addressIndex}][number]" required>
+                <label>Street:</label>
+                <input type="text" class="form-control" name="addresses[${addressIndex}][street]" required>
+                <label>City:</label>
+                <input type="text" class="form-control" name="addresses[${addressIndex}][city]" required>
+                <button type="button" class="btn btn-danger remove-address" style="margin-top: 10px;">Remove</button>
+            `;
+            addressList.appendChild(newField);
+            addressIndex++;
+            setupRemoveButtons();
+        });
+
+        function setupRemoveButtons() {
+            document.querySelectorAll('.remove-address').forEach(button => {
+                button.addEventListener('click', function () {
+                    this.parentElement.remove();
+                });
+            });
+        }
+
         setupRemoveButtons();
     });
-
-    function setupRemoveButtons() {
-        document.querySelectorAll('.remove-address').forEach(button => {
-            button.addEventListener('click', function () {
-                this.parentElement.remove();
-            });
-        });
-    }
-
-    setupRemoveButtons(); // Set up remove buttons for dynamically added address fields
-});
 </script>
 @endsection
