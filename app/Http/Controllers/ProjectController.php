@@ -33,8 +33,15 @@ class ProjectController extends Controller
      */
     public function store(StoreProjectRequest $request)
     {
-        $project = Project::create($request->validated());
-        $project->customers()->sync($request->get('customers', []));
+        $validatedData = $request->validated();
+
+        $project = Project::create([
+            'name' => $validatedData['name'],
+            'description' => $validatedData['description'],
+        ]);
+        $customerIds = explode(',', $request->input('customers'));
+
+        $project->customers()->sync($customerIds);
         return redirect()->route('projects.index')->with('success', 'Project created successfully.');
     }
 
@@ -53,7 +60,7 @@ class ProjectController extends Controller
     public function edit(Project $project)
     {
         $customers = Customer::all(); 
-        $selectedCustomers = $project->customers->pluck('id')->toArray();
+        $selectedCustomers = $project->customers->pluck('id')->implode(',');
 
         return view('projects.edit', compact('project', 'customers', 'selectedCustomers'));
     }
@@ -63,8 +70,13 @@ class ProjectController extends Controller
      */
     public function update(StoreProjectRequest $request, Project $project)
     {
-        $project->update($request->validated());
-        $project->customers()->sync($request->get('customers', [])); 
+        $validatedData = $request->validated();
+
+        $project->update($validatedData);
+        $customerIds = explode(',', $request->input('customers'));
+
+        $project->customers()->sync($customerIds);
+
         return redirect()->route('projects.index')->with('success', 'Project updated successfully.');
     }
 
