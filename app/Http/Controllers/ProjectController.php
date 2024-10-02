@@ -33,16 +33,21 @@ class ProjectController extends Controller
      */
     public function store(StoreProjectRequest $request)
     {
-        $validatedData = $request->validated();
+        try {
+            $validatedData = $request->validated();
 
-        $project = Project::create([
-            'name' => $validatedData['name'],
-            'description' => $validatedData['description'],
-        ]);
-        $customerIds = explode(',', $request->input('customers'));
+            $project = Project::create([
+                'name' => $validatedData['name'],
+                'description' => $validatedData['description'],
+            ]);
 
-        $project->customers()->sync($customerIds);
-        return redirect()->route('projects.index')->with('success', 'Project created successfully.');
+            $customerIds = explode(',', $request->input('customers'));
+            $project->customers()->sync($customerIds);
+
+            return response()->json(['success' => true, 'message' => 'Project created successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to create project.']);
+        }
     }
 
     /**

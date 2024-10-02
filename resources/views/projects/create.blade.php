@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <h1>Add/Edit Project</h1>
-    <form action="{{ route('projects.store') }}" method="POST">
+    <form id="project-form" method="POST">
         @csrf
         <div class="form-group">
             <label for="name">Project Name</label>
@@ -34,6 +34,8 @@
 
         <button type="submit" class="btn btn-primary">Save</button>
     </form>
+
+    <div id="status-message" class="alert" style="display:none;"></div>
 </div>
 
 <script>
@@ -42,6 +44,8 @@
         const customerResults = document.getElementById('customer-results');
         const selectedCustomersList = document.getElementById('selected-customers-list');
         const selectedCustomersInput = document.getElementById('selected-customers');
+        const form = document.getElementById('project-form');
+        const statusMessage = document.getElementById('status-message');
 
         let selectedCustomers = [];
 
@@ -95,6 +99,34 @@
         function updateSelectedCustomersInput() {
             selectedCustomersInput.value = selectedCustomers.join(',');
         }
+
+        // Handle AJAX form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(form);
+
+            fetch('{{ route('projects.store') }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    statusMessage.classList.add('alert-success');
+                    statusMessage.textContent = data.message;
+                    statusMessage.style.display = 'block';
+                    setTimeout(() => window.location.href = '/projects', 1000);
+                } else {
+                    statusMessage.classList.add('alert-danger');
+                    statusMessage.textContent = 'Error: ' + data.message;
+                    statusMessage.style.display = 'block';
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
     });
 </script>
 @endsection
