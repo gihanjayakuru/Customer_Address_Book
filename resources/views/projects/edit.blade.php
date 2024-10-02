@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <h1>Edit Project</h1>
-    <form action="{{ route('projects.update', $project->id) }}" method="POST">
+    <form id="project-update-form" method="POST">
         @csrf
         @method('PUT')
 
@@ -45,6 +45,8 @@
 
         <button type="submit" class="btn btn-primary">Update</button>
     </form>
+
+    <div id="status-message" class="alert" style="display:none;"></div>
 </div>
 
 <script>
@@ -53,6 +55,8 @@
         const customerResults = document.getElementById('customer-results');
         const selectedCustomersList = document.getElementById('selected-customers-list');
         const selectedCustomersInput = document.getElementById('selected-customers');
+        const form = document.getElementById('project-update-form');
+        const statusMessage = document.getElementById('status-message');
 
         let selectedCustomers = {{ json_encode($project->customers->pluck('id')) }};  // Initialize with existing customers
 
@@ -106,6 +110,34 @@
         function updateSelectedCustomersInput() {
             selectedCustomersInput.value = selectedCustomers.join(',');
         }
+
+        // handle ajax form submission for update
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(form);
+
+            fetch('{{ route('projects.update', $project->id) }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    statusMessage.classList.add('alert-success');
+                    statusMessage.textContent = data.message;
+                    statusMessage.style.display = 'block';
+                    setTimeout(() => window.location.href = '/projects', 1000);
+                } else {
+                    statusMessage.classList.add('alert-danger');
+                    statusMessage.textContent = 'Error: ' + data.message;
+                    statusMessage.style.display = 'block';
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
     });
 </script>
 @endsection

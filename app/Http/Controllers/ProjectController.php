@@ -75,15 +75,19 @@ class ProjectController extends Controller
      */
     public function update(StoreProjectRequest $request, Project $project)
     {
-        $validatedData = $request->validated();
+        try {
+            $validatedData = $request->validated();
 
-        $project->update($validatedData);
-        $customerIds = explode(',', $request->input('customers'));
+            $project->update($validatedData);
+            $customerIds = explode(',', $request->input('customers'));
+            $project->customers()->sync($customerIds);
 
-        $project->customers()->sync($customerIds);
-
-        return redirect()->route('projects.index')->with('success', 'Project updated successfully.');
+            return response()->json(['success' => true, 'message' => 'Project updated successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to update project.']);
+        }
     }
+
 
     /**
      * Remove the specified resource from storage.
