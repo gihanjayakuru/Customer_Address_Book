@@ -6,6 +6,7 @@ use App\Http\Requests\StoreCustomerRequest;
 use App\Http\Resources\CustomerResource;
 use App\Models\Customer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class CustomerController extends Controller
 {
@@ -31,12 +32,17 @@ class CustomerController extends Controller
      */
     public function store(StoreCustomerRequest $request)
     {
-        $customer = Customer::create($request->validated());
-        if ($request->has('addresses')) {
-            $customer->addresses()->createMany($request->addresses);
-        }
+        try {
+            $customer = Customer::create($request->validated());
+            if ($request->has('addresses') && is_array($request->addresses)) {
+                $customer->addresses()->createMany($request->addresses);
+            }
 
-        return redirect()->route('customers.index')->with('success', 'Customer created successfully.');
+            return redirect()->route('customers.index')->with('success', 'Customer created successfully.');
+        } catch (\Exception $e) {
+            Log::alert('Customer creation failed: ' . $e->getMessage());
+            return redirect()->back()->withErrors('Failed to create customer.')->withInput();
+        }
     }
 
     /**

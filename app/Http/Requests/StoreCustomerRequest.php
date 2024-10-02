@@ -24,14 +24,12 @@ class StoreCustomerRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'company' => 'required|string|max:255',
-            'phone'=> 'required|string|max:255',
-            'email'=>'required|string|email|max:255|unique:customers',
-            'country'=>'required|string|max:255',
-            'status'=>'required|in:Active,Inactive',
-            'addresses'=>'array',
-            'addresses.*.number'=>'required|string|max:255',
-            'addresses.*.street'=>'required|string|max:255',
-            'addresses.*.city'=>'required|string|max:255'
+            'phone' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:customers,email',
+            'country' => 'required|string|max:255',
+            'addresses.*.number' => 'required|string|max:255',
+            'addresses.*.street' => 'required|string|max:255',
+            'addresses.*.city' => 'required|string|max:255',
         ];
     }
 }
