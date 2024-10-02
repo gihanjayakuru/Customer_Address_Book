@@ -21,12 +21,15 @@ class StoreCustomerRequest extends FormRequest
      */
     public function rules(): array
     {
+        $customerId = $this->route('customer') ? $this->route('customer')->id : null;
+
         return [
             'name' => 'required|string|max:255',
             'company' => 'required|string|max:255',
             'phone' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:customers,email',
+            'email' => 'required|string|email|max:255|unique:customers,email,' . $customerId,
             'country' => 'required|string|max:255',
+            'addresses' => 'nullable|array',
             'addresses.*.number' => 'required|string|max:255',
             'addresses.*.street' => 'required|string|max:255',
             'addresses.*.city' => 'required|string|max:255',

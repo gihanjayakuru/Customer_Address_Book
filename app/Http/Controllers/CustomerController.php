@@ -57,8 +57,10 @@ class CustomerController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Customer $customer)
     {
+        $customer->load('addresses');
+ 
         return view('customers.edit', compact('customer'));
     }
 
@@ -68,8 +70,8 @@ class CustomerController extends Controller
     public function update(StoreCustomerRequest $request, Customer $customer)
     {
         $customer->update($request->validated());
-        $customer->addresses()->delete(); 
-        if ($request->has('addresses')) {
+        $customer->addresses()->delete();
+        if ($request->has('addresses') && is_array($request->addresses)) {
             $customer->addresses()->createMany($request->addresses);
         }
 

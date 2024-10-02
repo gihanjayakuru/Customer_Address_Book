@@ -52,9 +52,10 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        $customers = Customer::all();
-        $project->load('customers');
-        return view('projects.edit', compact('project', 'customers'));
+        $customers = Customer::all(); 
+        $selectedCustomers = $project->customers->pluck('id')->toArray();
+
+        return view('projects.edit', compact('project', 'customers', 'selectedCustomers'));
     }
 
     /**
