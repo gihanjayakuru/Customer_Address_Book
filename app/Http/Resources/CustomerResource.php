@@ -21,7 +21,7 @@ class CustomerResource extends JsonResource
             'phone' => $this->phone,
             'email' => $this->email,
             'country' => $this->country,
-            // 'addresses' => AddressResource::collection($this->whenLoaded('addresses')),
+            'addresses' => AddressResource::collection($this->whenLoaded('addresses')),
         ];
     }
 }
