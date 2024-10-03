@@ -1,8 +1,8 @@
 <?php
 
+use App\Http\Controllers\API\CustomerApiController;
+use App\Http\Controllers\API\ProjectApiController;
 use App\Http\Controllers\Auth\ApiAuthController;
-use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\ProjectController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,11 +21,11 @@ Route::get('/', function () {
     return response()->json(['message' => 'Welcome to the application'], 200);
 });
 
-Route::post('register', [ApiAuthController::class, 'register']);
-Route::post('login', [ApiAuthController::class, 'login']);
-Route::middleware('auth:sanctum')->post('logout', [ApiAuthController::class, 'logout']);
+Route::post('register', [ApiAuthController::class, 'register'])->name('api.register');
+Route::post('login', [ApiAuthController::class, 'login'])->name('api.login');
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::apiResource('customers', CustomerController::class);
-    Route::apiResource('projects', ProjectController::class);
+    Route::post('logout', [ApiAuthController::class, 'logout'])->name('api.logout');
+    Route::apiResource('customers', CustomerApiController::class);
+    Route::apiResource('projects', ProjectApiController::class);
 });

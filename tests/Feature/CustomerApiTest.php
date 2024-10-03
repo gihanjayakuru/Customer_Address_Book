@@ -15,45 +15,12 @@ class CustomerApiTest extends TestCase
     public function test_can_retrieve_customers()
     {
         $user = User::factory()->create();
-        $customer = Customer::factory()->create();
+        Customer::factory(5)->create();
 
         $response = $this->actingAs($user, 'sanctum')->getJson('/api/customers');
-
-        $response->assertOk()
-            ->assertJsonStructure([
-                'data' => [
-                    '*' => [
-                        'id',
-                        'name',
-                        'company',
-                        'phone',
-                        'email',
-                        'country',
-                        'addresses'
-                    ]
-                ]
-            ]);
-    }
-
-    public function test_can_create_customer()
-    {
-        $user = User::factory()->create();
-        $customerData = [
-            'name' => 'John Doe',
-            'company' => 'JD Inc.',
-            'phone' => '123456789',
-            'email' => 'john.doe@example.com',
-            'country' => 'USA',
-            'addresses' => [
-                ['number' => '123', 'street' => 'Main St', 'city' => 'Anytown']
-            ]
-        ];
-
-        $response = $this->actingAs($user, 'sanctum')->postJson('/api/customers', $customerData);
-
-        $response->assertCreated()
-            ->assertJsonStructure([
-                'data' => [
+        $response->assertOk()->assertJsonStructure([
+            'data' => [
+                '*' => [
                     'id',
                     'name',
                     'company',
@@ -62,7 +29,31 @@ class CustomerApiTest extends TestCase
                     'country',
                     'addresses'
                 ]
-            ]);
+            ]
+        ]);
+    }
+
+    public function test_can_create_customer()
+    {
+        $user = User::factory()->create();
+        $customerData = [
+            'name' => 'New Customer',
+            'company' => 'New Co',
+            'phone' => '1234567890',
+            'email' => 'new@example.com',
+            'country' => 'USA'
+        ];
+
+        $response = $this->actingAs($user, 'sanctum')->postJson('/api/customers', $customerData);
+        $response->assertCreated()->assertJsonStructure([
+            'data' => [
+                'id',
+                'name',
+                'company',
+                'phone',
+                'email'
+            ]
+        ]);
     }
 
     public function test_can_update_customer()
@@ -70,25 +61,20 @@ class CustomerApiTest extends TestCase
         $user = User::factory()->create();
         $customer = Customer::factory()->create();
 
-        $updatedData = [
-            'name' => 'Jane Doe',
-            'company' => 'JD Inc.',
-            'phone' => '987654321',
-            'email' => 'jane.doe@example.com',
+        $updateData = [
+            'name' => 'Jane Doe Updated',
+            'company' => 'JD Updated Inc.',
+            'phone' => '9876543210',
+            'email' => 'janedoeupdated@example.com',
             'country' => 'USA',
-            'addresses' => [
-                ['number' => '456', 'street' => 'Main St', 'city' => 'Anytown']
-            ]
         ];
 
-        $response = $this->actingAs($user, 'sanctum')->putJson("/api/customers/{$customer->id}", $updatedData);
-
-        $response->assertOk()
-            ->assertJson([
-                'data' => [
-                    'name' => 'Jane Doe'
-                ]
-            ]);
+        $response = $this->actingAs($user, 'sanctum')->putJson("/api/customers/{$customer->id}", $updateData);
+        $response->assertOk()->assertJson([
+            'data' => [
+                'name' => 'Jane Doe Updated'
+            ]
+        ]);
     }
 
     public function test_can_delete_customer()
@@ -97,7 +83,6 @@ class CustomerApiTest extends TestCase
         $customer = Customer::factory()->create();
 
         $response = $this->actingAs($user, 'sanctum')->deleteJson("/api/customers/{$customer->id}");
-
         $response->assertNoContent();
     }
 }

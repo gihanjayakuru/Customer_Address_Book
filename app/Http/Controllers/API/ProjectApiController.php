@@ -13,32 +13,33 @@ class ProjectApiController extends Controller
 {
     public function index()
     {
-        $projects = Project::with('customers')->get();
+        $projects = Project::with('customers')->paginate(10);
         return ProjectResource::collection($projects);
     }
 
     public function store(StoreProjectRequest $request)
     {
         $project = Project::create($request->validated());
-        $project->customers()->sync($request->input('customers', []));
+        $project->customers()->sync($request->input('customers'));
+        $project->load('customers');
         return new ProjectResource($project);
     }
 
     public function show(Project $project)
     {
-        return new ProjectResource($project->load('customers'));
+        return new ProjectResource($project);
     }
 
     public function update(StoreProjectRequest $request, Project $project)
     {
         $project->update($request->validated());
-        $project->customers()->sync($request->input('customers', []));
+        $project->customers()->sync($request->input('customers'));
         return new ProjectResource($project);
     }
 
     public function destroy(Project $project)
     {
         $project->delete();
-        return response()->json(['message' => 'Project deleted successfully'], 200);
+        return response()->json(['message' => 'Project deleted successfully'], 204);
     }
 }
