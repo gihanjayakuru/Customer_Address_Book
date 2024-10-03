@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class ApiAuthController extends Controller
 {
@@ -16,22 +18,16 @@ class ApiAuthController extends Controller
      */
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required'
-        ]);
+        $credentials = $request->only('email', 'password');
 
-        if (Auth::attempt($request->only('email', 'password'))) {
-            // $user = Auth::user();
-            $token = $request->user()->createToken('API Token')->plainTextToken;
-
-            return response()->json([
-                'message' => 'Login successful',
-                'token' => $token
-            ], 200);
+        if (!$token = auth()->attempt($credentials)) {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        return response()->json(['message' => 'Invalid credentials'], 401);
+        return response()->json([
+            'token' => $token,
+            'user' => auth()->user(),
+        ]);
     }
 
     /**
@@ -42,8 +38,26 @@ class ApiAuthController extends Controller
      */
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
-
+        $request->user()->tokens()->delete();
         return response()->json(['message' => 'Logged out successfully'], 200);
+    }
+
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json(['token' => $token, 'user' => $user], 201);
     }
 }

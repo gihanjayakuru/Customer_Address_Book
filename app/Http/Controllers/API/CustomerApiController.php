@@ -6,19 +6,22 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCustomerRequest;
 use App\Http\Resources\CustomerResource;
 use App\Models\Customer;
-use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class CustomerApiController extends Controller
 {
     public function index()
     {
-        return CustomerResource::collection(Customer::with('addresses')->get());
+        $customers = Customer::with('addresses')->get();
+        return CustomerResource::collection($customers);
     }
 
     public function store(StoreCustomerRequest $request)
     {
         $customer = Customer::create($request->validated());
-        $customer->addresses()->createMany($request->addresses);
+        if ($request->has('addresses')) {
+            $customer->addresses()->createMany($request->addresses);
+        }
         return new CustomerResource($customer);
     }
 
@@ -38,7 +41,6 @@ class CustomerApiController extends Controller
     public function destroy(Customer $customer)
     {
         $customer->delete();
-        return response()->json(null, 204);
+        return response()->json(['message' => 'Customer deleted successfully'], 200);
     }
-
 }

@@ -17,9 +17,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/login', [ApiAuthController::class, 'login'])->name('api.login');
+Route::get('/', function () {
+    return response()->json(['message' => 'Welcome to the application'], 200);
+});
+
+Route::post('register', [ApiAuthController::class, 'register']);
+Route::post('login', [ApiAuthController::class, 'login']);
+Route::middleware('auth:sanctum')->post('logout', [ApiAuthController::class, 'logout']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::apiResource('customers', 'CustomerApiController');
-    Route::apiResource('projects', 'ProjectApiController');
+    Route::apiResource('customers', CustomerController::class);
+    Route::apiResource('projects', ProjectController::class);
 });

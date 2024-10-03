@@ -7,18 +7,20 @@ use App\Http\Requests\StoreProjectRequest;
 use App\Http\Resources\ProjectResource;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class ProjectApiController extends Controller
 {
     public function index()
     {
-        return ProjectResource::collection(Project::with('customers')->get());
+        $projects = Project::with('customers')->get();
+        return ProjectResource::collection($projects);
     }
 
     public function store(StoreProjectRequest $request)
     {
         $project = Project::create($request->validated());
-        $project->customers()->sync($request->customers);
+        $project->customers()->sync($request->input('customers', []));
         return new ProjectResource($project);
     }
 
@@ -30,13 +32,13 @@ class ProjectApiController extends Controller
     public function update(StoreProjectRequest $request, Project $project)
     {
         $project->update($request->validated());
-        $project->customers()->sync($request->customers);
+        $project->customers()->sync($request->input('customers', []));
         return new ProjectResource($project);
     }
 
     public function destroy(Project $project)
     {
         $project->delete();
-        return response()->json(null, 204);
+        return response()->json(['message' => 'Project deleted successfully'], 200);
     }
 }
