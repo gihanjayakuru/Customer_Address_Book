@@ -52,6 +52,9 @@
             const customerResults = document.getElementById('customer-results');
             const selectedCustomersList = document.getElementById('selected-customers-list');
             const selectedCustomersInput = document.getElementById('selected-customers');
+            const form = document.getElementById('project-update-form');
+            const statusMessage = document.createElement('div');
+            form.appendChild(statusMessage);
 
             let selectedCustomers = @json($project->customers->pluck('id'));
 
@@ -96,6 +99,41 @@
             function updateSelectedCustomersInput() {
                 selectedCustomersInput.value = selectedCustomers.join(',');
             }
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(form);
+
+                selectedCustomers.forEach(id => {
+                    formData.append('customers[]', id.toString());
+                });
+
+                const url = form.getAttribute('action');
+
+                fetch(url, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                .getAttribute('content'),
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            statusMessage.className = 'alert alert-success';
+                            statusMessage.textContent = data.message;
+                            setTimeout(() => window.location.href = '/projects', 1000);
+                        } else {
+                            throw new Error(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        statusMessage.className = 'alert alert-danger';
+                        statusMessage.textContent = 'Error: ' + error.message;
+                    });
+            });
         });
     </script>
 @endsection

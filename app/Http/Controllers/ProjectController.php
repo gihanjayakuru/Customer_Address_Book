@@ -72,19 +72,17 @@ class ProjectController extends Controller
      */
     public function update(StoreProjectRequest $request, Project $project)
     {
-        try {
-            $validated = $request->validated();
-            $project->update([
-                'name' => $validated['name'],
-                'description' => $validated['description']
-            ]);
+        $validated = $request->validated();
+        $project->update($validated);
 
-            $project->customers()->sync($validated['customers']);
+        if (isset($validated['customers']) && is_array($validated['customers'])) {
 
-            return response()->json(['success' => true, 'message' => 'Project successfully updated!']);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Failed to update project.']);
+            $customerIds = array_map('intval', $validated['customers']);
+            $project->customers()->sync($customerIds);
+        } else {
+            $project->customers()->detach();
         }
+        return response()->json(['success' => true, 'message' => 'Project successfully updated!']);
     }
 
 
