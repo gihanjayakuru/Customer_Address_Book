@@ -20,15 +20,19 @@ class ApiAuthController extends Controller
     {
         $credentials = $request->only('email', 'password');
 
-        if (!$token = auth()->attempt($credentials)) {
+        if (!Auth::attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
+        $user = Auth::user();
+        $token = $user->createToken('Addressbook')->plainTextToken;
+
         return response()->json([
             'token' => $token,
-            'user' => auth()->user(),
+            'user' => $user
         ]);
     }
+
 
     /**
      * Handle user logout and revoke the token.

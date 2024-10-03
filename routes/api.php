@@ -17,10 +17,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return response()->json(['message' => 'Welcome to the application'], 200);
-});
-
 Route::post('register', [ApiAuthController::class, 'register'])->name('api.register');
 Route::post('login', [ApiAuthController::class, 'login'])->name('api.login');
 
