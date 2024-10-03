@@ -1,0 +1,307 @@
+{
+    "info": {
+        "_postman_id": "e55c7f53-1615-42c6-a51d-b98b5d17caec",
+        "name": "Address_Book",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "_exporter_id": "16190092"
+    },
+    "item": [
+        {
+            "name": "Customer",
+            "item": [
+                {
+                    "name": "List Customers",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/customers",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["customers"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Add Customer",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\r\n  \"name\": \"Jane Smith\",\r\n  \"company\": \"Example Inc\",\r\n  \"phone\": \"1234567890\",\r\n  \"email\": \"jane.smith@example.com\",\r\n  \"country\": \"USA\",\r\n  \"addresses\": [\r\n    {\r\n      \"number\": \"123\",\r\n      \"street\": \"Main St\",\r\n      \"city\": \"Anytown\"\r\n    }\r\n  ]\r\n}\r\n",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/customers",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["customers"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update a Single Customer",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PUT",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\r\n  \"name\": \"Jane Doe\",\r\n  \"company\": \"Example Co\",\r\n  \"phone\": \"987654321\",\r\n  \"email\": \"jane.doe@update.com\",\r\n  \"country\": \"USA\"\r\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/customers/17",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["customers", "17"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Customer",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/customers/27",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["customers", "27"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Project",
+            "item": [
+                {
+                    "name": "Create a Project",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\r\n  \"name\": \"New Project\",\r\n  \"description\": \"Description of the new project\",\r\n  \"customers\": [17]\r\n}\r\n",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/projects",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["projects"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get All Projects",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/projects",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["projects"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get a Single Project",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/projects/5",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["projects", "5"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update a Project",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PUT",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\r\n  \"name\": \"Updated Project Name New\",\r\n  \"description\": \"Updated description of the project\",\r\n  \"customers\": [17]\r\n}\r\n",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/projects/5",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["projects", "5"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete a Project",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/projects/5",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["projects", "5"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Register User",
+            "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\r\n  \"name\": \"John Doe\",\r\n  \"email\": \"john.doe@example.com\",\r\n  \"password\": \"password\",\r\n  \"password_confirmation\": \"password\"\r\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/register",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["register"]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Login User",
+            "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\r\n  \"email\": \"john.doe@example.com\",\r\n  \"password\": \"password\"\r\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/login",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["login"]
+                }
+            },
+            "response": []
+        }
+    ]
+}
